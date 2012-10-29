@@ -1,0 +1,6 @@
+Personal emacs settings, collected during the years
+Very rough, very shitty, very useful.
+
+Using Emacs 24.1.1
+
+(load "~/.emacs.d/dot-emacs.el")
