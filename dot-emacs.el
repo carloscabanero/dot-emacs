@@ -5,7 +5,8 @@
 (line-number-mode t)
 (column-number-mode t)
 (tool-bar-mode -1)
-(scroll-bar-mode nil)
+(scroll-bar-mode -1)
+(menu-bar-mode 0)
 
 (iswitchb-mode t)
 
@@ -13,11 +14,17 @@
 (progn (cd "~/.emacs.d") (normal-top-level-add-subdirs-to-load-path))
 
 ;; Configure themes
-(set-default-font "Monospace-10")
+(set-default-font "Monospace-11")
 ;; Set color scheme (set lconfig-dark-bg-scheme to t for reverse color scheme)
-(set-foreground-color "#f8f8f2")
-(set-background-color "#272822")
-(defconst cursor-color "#f8f8f0")
+;;(set-foreground-color "#f8f8f2")
+(setq default-frame-alist
+      (append default-frame-alist
+       '((foreground-color . "#f8f8f2")
+ (background-color . "#272822")
+ (cursor-color . "#f8f8f0")
+ )))
+;; (set-background-color "#272822")
+;; (defconst cursor-color "#f8f8f0")
 (set-face-foreground 'font-lock-comment-face "#95917E")
 (set-face-foreground 'font-lock-string-face "#e6db74")
 (set-face-foreground 'font-lock-keyword-face "#F92672")
@@ -36,6 +43,21 @@
 ;; Setup save options (auto and backup) -- still buggy need new Replace func
 (setq auto-save-timeout 2000)
 (setq make-backup-files t)
+
+;; El-get
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+
+(require 'ag)
+(setq ag-highlight-search t)
+
+(unless (require 'el-get nil 'noerror)
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+    (goto-char (point-max))
+    (eval-print-last-sexp)))
+
+(el-get 'sync)
 
 ;; Full screen toggle mode
 (defun toggle-fullscreen (&optional f)
@@ -84,41 +106,8 @@
 ;; optional keyboard short-cut
 (global-set-key "\C-xm" 'browse-url-at-point)
 
-;; (defun toolbox-python-mode-hook ()
-;;   ;; Setup Pymacs
-;;   (autoload 'pymacs-apply' "pymacs")
-;;   (autoload 'pymacs-call' "pymacs")
-;;   (autoload 'pymacs-eval' "pymacs" nil t)
-;;   (autoload 'pymacs-exec "pymacs" nil t)
-;;   (autoload 'pymacs-load "pymacs" nil t)
-;;   ;;(eval-after-load "pymacs"
-;;   ;;  '(add-to-list 'pymacs-load-path "YOUR-PYMACS-DIR"))
-
-;;   ;; Setting up ropemacs
-;;   (require 'pymacs)
-;;   (pymacs-load "ropemacs" "rope-")
-;;   (setq ropemacs-enable-autoimport 't)
-;;   (setq ropemacs-autoimport-modules '("google.appengine"))
-
-;;   ;;(flymake-mode 1)
-;;   ;; Setting up flymake to use pyflakes
- 
-;;   (when (load "flymake" t) 
-;;     (defun flymake-pyflakes-init () 
-;;       (let* ((temp-file (flymake-init-create-temp-buffer-copy 
-;;                          'flymake-create-temp-inplace)) 
-;;              (local-file (file-relative-name 
-;;                           temp-file 
-;;                           (file-name-directory buffer-file-name)))) 
-;;         (list "pyflakes" (list local-file)))) 
-
-;;     (add-to-list 'flymake-allowed-file-name-masks 
-;;                  '("\\.py\\'" flymake-pyflakes-init)))
-
-;;   (flymake-mode 1)
-;; )
-
-;; (add-hook 'python-mode-hook 'toolbox-python-mode-hook)
+;; jedi
+(add-hook 'python-mode-hook 'jedi:setup)
 
 ;; Load nxml-mode for files ending in .xml, .xsl, .rng, .xhtml
 (add-to-list 'auto-mode-alist '("\\.\\(xml\\|xsl\\|rng\\|xhtml\\)\\'" . nxml-mode))
@@ -285,6 +274,13 @@
 ;; Setup my own packages
 ;(add-to-list 'load-path (expand-file-name "~/elisp/"))
 ;(require 'cpp-font-lock)
+
+;;W3m mode
+(setq browse-url-browser-function 'w3m-browse-url)
+(autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+;; optional keyboard short-cut
+(global-set-key "\C-xm" 'browse-url-at-point)
+(setq w3m-use-cookies t)
 
 ;; Add final message so using C-h l I can see if .emacs failed
 (message ".emacs loaded successfully.")
